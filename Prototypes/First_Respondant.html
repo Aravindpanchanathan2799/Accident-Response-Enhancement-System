@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accident Report App</title>
+</head>
+<body>
+    <h1>Accident Report Form</h1>
+    <button onclick="reportEmergency()">Report Emergency</button>
+    <form id="accidentReportForm" style="margin-top: 20px;">
+        <div>
+            <label for="accidentDescription">Describe the Accident:</label>
+            <button type="button" onclick="startDictation()" id="startVoiceInput">Start Voice Input</button>
+            <textarea id="accidentDescription" name="accidentDescription" rows="4" cols="50"></textarea>
+        </div>
+        <div>
+            <label for="accidentImages">Upload Images:</label>
+            <input type="file" id="accidentImages" name="accidentImages" multiple>
+        </div>
+        <div>
+            <label for="latitude">Latitude:</label>
+            <input type="text" id="latitude" name="latitude" placeholder="Latitude">
+            <label for="longitude">Longitude:</label>
+            <input type="text" id="longitude" name="longitude" placeholder="Longitude">
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city" placeholder="City">
+            <label for="state">State:</label>
+            <input type="text" id="state" name="state" placeholder="State">
+        </div>
+        <input type="hidden" id="timestamp" name="timestamp">
+        <button type="button" onclick="submitAccidentReport()">Submit Report</button>
+    </form>
+    <script src="First_Respondant.js"></script>
+</body>
+</html>
