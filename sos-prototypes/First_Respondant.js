@@ -7,13 +7,13 @@ function startDictation() {
         recognition.lang = "en-US";
         recognition.start();
 
-        recognition.onresult = function (e) {
+        recognition.onresult = function(e) {
             document.getElementById('accidentDescription').value = e.results[0][0].transcript;
             recognition.stop();
             document.getElementById('startVoiceInput').innerHTML = 'Start Voice Input'; // Reset button text after speaking
         };
 
-        recognition.onerror = function (e) {
+        recognition.onerror = function(e) {
             recognition.stop();
         }
 
@@ -22,64 +22,6 @@ function startDictation() {
         }
     }
 }
-
-function reportEmergency() {
-    const time = new Date().toISOString();
-    console.log("Emergency reported at:", time);
-    alert("Emergency reported successfully. Please provide more details in the form.");
-}
-
-function submitAccidentReport() {
-    const description = document.getElementById('accidentDescription').value;
-    const images = document.getElementById('accidentImages').files;
-    const latitude = document.getElementById('latitude').value;
-    const longitude = document.getElementById('longitude').value;
-    const city = document.getElementById('city').value;
-    const state = document.getElementById('state').value;
-    const timestamp = document.getElementById('timestamp').value;
-
-    const imageNames = Array.from(images).map(file => file.name).join(', ');
-    console.log("Accident Description:", description);
-    console.log("Latitude:", latitude, "Longitude:", longitude);
-    console.log("City:", city, "State:", state);
-    console.log("Timestamp:", timestamp);
-    console.log("Images Uploaded:", imageNames);
-
-    alert("Accident report submitted. All details including location and images will be processed.");
-
-        // You might want to send image data differently, here we're just sending other data.
-        const accidentData = {
-            description: description,
-            location: {
-                latitude: latitude,
-                longitude: longitude,
-                city: city,
-                state: state
-            },
-            timestamp: timestamp
-            // Images are not included here. You would typically handle them via a separate API or service.
-        };
-    
-        // Use fetch API to send data to your server
-        fetch('/report-accident', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(accidentData)
-        })
-        .then(response => response.json())  // Assuming the server responds with JSON
-        .then(data => alert('Report submitted: ' + JSON.stringify(data)))
-        .catch(error => console.error('Error:', error));
-    
-        // Log image file names, consider handling uploads separately.
-        console.log("Images Uploaded:", imageNames);
-}
-
-document.getElementById('accidentReportForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    submitAccidentReport();
-});
 
 function reportEmergency() {
     const time = new Date().toISOString();
@@ -118,3 +60,54 @@ function handleLocationError(error) {
             break;
     }
 }
+
+function submitAccidentReport() {
+    const description = document.getElementById('accidentDescription').value;
+    const images = document.getElementById('accidentImages').files;
+    const latitude = document.getElementById('latitude').value;
+    const longitude = document.getElementById('longitude').value;
+    const city = document.getElementById('city').value;
+    const state = document.getElementById('state').value;
+    const timestamp = document.getElementById('timestamp').value;
+
+    const imageNames = Array.from(images).map(file => file.name).join(', ');
+    console.log("Accident Description:", description);
+    console.log("Latitude:", latitude, "Longitude:", longitude);
+    console.log("City:", city, "State:", state);
+    console.log("Timestamp:", timestamp);
+    console.log("Images Uploaded:", imageNames);
+
+    alert("Accident report submitted. All details including location and images will be processed.");
+
+    // You might want to send image data differently, here we're just sending other data.
+    const accidentData = {
+        description: description,
+        location: {
+            latitude: latitude,
+            longitude: longitude,
+            city: city,
+            state: state
+        },
+        timestamp: timestamp
+        // Images are not included here. You would typically handle them via a separate API or service.
+    };
+
+    fetch('http://localhost:3000/report-accident', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(accidentData)
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+    })
+    .then(data => alert('Report submitted: ' + JSON.stringify(data)))
+    .catch(error => console.error('Error:', error));
+}
+
+document.getElementById('accidentReportForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    submitAccidentReport();
+});
