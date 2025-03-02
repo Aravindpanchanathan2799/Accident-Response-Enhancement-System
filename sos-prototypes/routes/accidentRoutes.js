@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const multer = require('multer'); 
+const fs = require('fs');
 const router = express.Router();
 const Accident = require('../models/accident');
 
@@ -74,12 +76,10 @@ router.get('/report/:id', async (req, res) => {
     try {
         const accidentId = req.params.id;
 
-        // ✅ Validate MongoDB ObjectId
         if (!mongoose.Types.ObjectId.isValid(accidentId)) {
             return res.status(400).json({ error: "Invalid accident ID" });
         }
 
-        // ✅ Fetch the record
         const accident = await Accident.findById(accidentId);
 
         if (!accident) {
@@ -89,6 +89,54 @@ router.get('/report/:id', async (req, res) => {
         res.json(accident);
     } catch (error) {
         console.error('Error fetching accident report:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+const uploadDir = 'uploads/';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); 
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname); 
+    }
+});
+const upload = multer({ storage: storage });
+
+
+router.put('/report/:id/images', upload.array('images', 5), async (req, res) => {
+    try {
+        const accidentId = req.params.id;
+        const imageFiles = req.files; 
+
+        if (!mongoose.Types.ObjectId.isValid(accidentId)) {
+            return res.status(400).json({ error: "Invalid accident ID" });
+        }
+
+        if (!imageFiles || imageFiles.length === 0) {
+            return res.status(400).json({ error: "No images uploaded" });
+        }
+        const imageUrls = imageFiles.map(file => `/uploads/${file.filename}`);
+        const updatedAccident = await Accident.findByIdAndUpdate(
+            accidentId,
+            { $push: { images: { $each: imageUrls } } }, 
+            { new: true }
+        );
+
+        if (!updatedAccident) {
+            return res.status(404).json({ error: "Accident record not found" });
+        }
+
+        res.json({
+            message: "Images added successfully",
+            updatedAccident
+        });
+    } catch (error) {
+        console.error('Error adding images:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
