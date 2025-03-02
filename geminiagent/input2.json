@@ -1,0 +1,7 @@
+{
+  "updateDescription": "The patient is showing signs of severe allergic reactions.",
+  "additionalInfo": {
+    "bloodType": "A-positive",
+    "knownAllergies": ["Iodine"]
+  }
+}
